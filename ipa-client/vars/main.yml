@@ -1,0 +1,4 @@
+ip:       "192.168.19.20"
+fqdn:     "app01.example.com"
+hostname: "app01"
+password: "aaaAAA111"

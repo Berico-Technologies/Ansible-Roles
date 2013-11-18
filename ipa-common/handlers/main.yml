@@ -1,0 +1,8 @@
+- name: restart iptables
+  service: name=iptables state=restarted
+  
+- name: restart network
+  service: name=network state=restarted
+  
+- name: reboot server
+  command: reboot

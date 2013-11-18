@@ -1,0 +1,42 @@
+---
+- name: Configure Network and Name Resolution
+  host: ip=127.0.0.1 hostname=localhost aliases=localhost.localdomain,localhost4,localhost4.localdomain4 state=present
+  host: ip=::1 hostname=localhost aliases=localhost.localdomain,localhost6,localhost6.localdomain6 state=present
+  host: ip="{{ip}}" hostname="{{fqdn}}" aliases="{{hostname}}" state=present
+
+- name: Write the KDC IP into hosts file
+  host: ip="{{kdc_ip}}" hostname="{{kdc_fqdn}}" aliases="{{kdc_name}}" state=present
+  when: kdc_ip != ip
+
+- name: Setup Search Domains
+  lineinfile: dest=/etc/resolv.conf regexp="^search {{ipa_domain}}$" line="search {{ipa_domain}}" state=present
+
+- name: Setup Nameservers
+  lineinfile: dest=/etc/resolv.conf regexp="^nameserver {{item}}$" line="nameserver {{item}}" state=present
+  with_items:
+    - "{{ kdc_ip }}"
+    - "{{ forwarder }}"
+    - 8.8.4.4
+  notify:
+    - restart network
+
+- name: Open the correct IPTables ports
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT$"
+              line="-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  with_items:
+    - { protocol: tcp, port: 80 }
+    - { protocol: tcp, port: 443 }
+    - { protocol: tcp, port: 389 }
+    - { protocol: tcp, port: 636 }
+    - { protocol: tcp, port: 88 }
+    - { protocol: tcp, port: 464 }
+    - { protocol: tcp, port: 53 }
+    - { protocol: udp, port: 88 }
+    - { protocol: udp, port: 464 }
+    - { protocol: udp, port: 53 }
+    - { protocol: udp, port: 123 }
+  notify:
+    - restart iptables
+
