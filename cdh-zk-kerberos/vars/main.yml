@@ -1,0 +1,7 @@
+fqdn:       "app01.example.com"
+ipa_realm:  "EXAMPLE.COM"
+ipa_domain: "example.com"
+kdc_fqdn:   "kdc.example.com"
+password:   "aaaAAA111"
+is_kdc:     false
+zk_nodes:   [ "app01", "app02" ]

@@ -1,4 +1,11 @@
 ---
+##!/bin/sh
+#make_resolv_conf() {
+#echo "doing nothing to resolv.conf"
+#}
+
+#chmod a+x /etc/dhcp/dhclient-enter-hooks
+
 - name: Configure Network and Name Resolution
   host: ip=127.0.0.1 hostname=localhost aliases=localhost.localdomain,localhost4,localhost4.localdomain4 state=present
   host: ip=::1 hostname=localhost aliases=localhost.localdomain,localhost6,localhost6.localdomain6 state=present
@@ -8,17 +15,9 @@
   host: ip="{{kdc_ip}}" hostname="{{kdc_fqdn}}" aliases="{{kdc_name}}" state=present
   when: kdc_ip != ip
 
-- name: Setup Search Domains
-  lineinfile: dest=/etc/resolv.conf regexp="^search {{ipa_domain}}$" line="search {{ipa_domain}}" state=present
-
-- name: Setup Nameservers
-  lineinfile: dest=/etc/resolv.conf regexp="^nameserver {{item}}$" line="nameserver {{item}}" state=present
-  with_items:
-    - "{{ kdc_ip }}"
-    - "{{ forwarder }}"
-    - 8.8.4.4
-  notify:
-    - restart network
+- name: Write the DNS configuration
+  template: src=resolv.conf.j2 dest=/etc/resolv.conf
+  notify: restart network
 
 - name: Open the correct IPTables ports
   lineinfile: dest=/etc/sysconfig/iptables

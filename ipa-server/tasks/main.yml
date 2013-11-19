@@ -7,7 +7,5 @@
     - ipa-server
 
 - name: Configure Free-IPA Server
-  command: "ipa-server-install --setup-dns --forwarder={{forwarder}} -r {{ipa_realm}} --hostname={{fqdn}} -n {{ipa_domain}} -a {{password}} -p {{password}} -U"
-  # This is essential; without a reboot, kinit would not work.
-  notify:
-    - reboot server
+  script: "configure_freeipa.py -f {{forwarder}} -r {{ipa_realm}} -h {{fqdn}} -d {{ipa_domain}} -p {{password}}"
+  notify: reboot sshd

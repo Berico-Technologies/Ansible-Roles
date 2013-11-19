@@ -8,6 +8,5 @@
     - mod_auth_kerb
 
 - name: Configure Free-IPA Client
-  command: "ipa-client-install --enable-dns-updates --ssh-trust-dns --domain={{ipa_domain}} --server={{kdc_fqdn}} -p admin -w {{password}} -U"
-  notify:
-    - reboot server
+  script: "configure_ipaclient.py -d {{ipa_domain}} -k {{kdc_fqdn}} -p {{password}}"
+  notify: reboot sshd

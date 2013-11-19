@@ -1,0 +1,34 @@
+---
+
+- name: Perform Kerberos Login as admin
+  script: "logon.py -p {{password}}"
+
+- name: Register services with Free-IPA.
+  script: "add_service.py -s zookeeper -f {{item}}.{{ipa_domain}} -r {{ipa_realm}}"
+  with_items: zk_nodes
+  when: is_kdc
+
+- name: Create a Keytab for the Service.
+  script: "create_keytab.py -k {{kdc_fqdn}} -p zookeeper/{{fqdn}} -f /etc/zookeeper/conf/krb5.keytab"
+
+- name: Auth Provider set as Kerberos in Zookeeper Config
+  lineinfile: dest=/etc/zookeeper/conf/zoo.cfg
+              regexp="^authProvider\.1=org\.apache\.zookeeper\.server\.auth\.SASLAuthenticationProvider$"
+              line="authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider"
+
+- name: JAAS Login Renewal set in Zookeeper Config
+  lineinfile: dest=/etc/zookeeper/conf/zoo.cfg
+              regexp="^jaasLoginRenew=3600000$"
+              line="jaasLoginRenew=3600000"
+
+- name: Copy the JAAS configuration file for zookeeper
+  template: src=jaas.conf.j2 dest=/etc/zookeeper/conf/jaas.conf
+
+- name: Set the environment flag to use JAAS Configuration
+  lineinfile: dest=/etc/zookeeper/conf/java.env
+              create=true
+              regexp='^export JVMFLAGS="-Djava.security.auth.login.config=/etc/zookeeper/conf/jaas.conf"$'
+              line='export JVMFLAGS="-Djava.security.auth.login.config=/etc/zookeeper/conf/jaas.conf"'
+
+- name: Restart Zookeeper
+  service: name=zookeeper-server state=restarted

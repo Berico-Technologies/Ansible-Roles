@@ -1,0 +1,23 @@
+---
+# The plays for zookeper daemons
+- name: Open the correct IPTables ports
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p tcp -m tcp --dport {{item}} -j ACCEPT$"
+              line="-A INPUT -p tcp -m tcp --dport {{item}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  with_items:
+    - "{{zk_clientport}}"
+    - "{{zk_leaderport}}"
+    - "{{zk_electionport}}"
+  notify:
+    - restart iptables
+
+- name: Install the zookeeper files
+  yum: name=zookeeper-server state=installed
+
+- name: Copy the configuration file for zookeeper
+  template: src=zoo.cfg.j2 dest=/etc/zookeeper/conf/zoo.cfg
+  notify: restart zookeeper
+
+- name: initialize the zookeper
+  shell: creates=/var/lib/zookeeper/myid service zookeeper-server init --myid=${zoo_id}
