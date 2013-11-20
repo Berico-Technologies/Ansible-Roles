@@ -1,0 +1,10 @@
+---
+
+- name: Ensure certificate directory exists
+  file: path="{{cert_root_dir}}" state=directory
+
+- name: Copy the OpenSSL Configuration to the Certificate directory
+  copy: src=openssl.cnf dest="{{cert_root_dir}}/openssl.cnf" mode=0440
+
+- name: Create Certificate Authority
+  script: "create_ca.sh {{cert_root_dir}} {{ca_country}} {{ca_state}} {{ca_city}} {{ca_organization}} {{ca_common_name}}"

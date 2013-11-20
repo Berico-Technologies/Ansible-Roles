@@ -1,0 +1,28 @@
+---
+- name: Add the Erlang Solutions Repository
+  copy: src=ErlangSolutions.repo dest=/etc/yum.repos.d/ErlangSolutions.repo mode=0440
+
+- name: Install Erlang Solutions RPM Key
+  rpm_key: key=http://packages.erlang-solutions.com/rpm/erlang_solutions.asc state=present
+
+- name: Install Erlang
+  yum: name=erlang enablerepo=erlang-solutions state=latest
+
+- name: Install RabbitMQ RPM key
+  rpm_key: key=http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+
+- name: Retrieve RabbitMQ RPM from RabbitMQ Website
+  get_url: url="{{rabbitmq_url}}" dest="/usr/share/{{rabbitmq_rpm}}" mode=0440
+
+- name: Install RabbitMQ RPM
+  yum: name="/usr/share/{{rabbitmq_rpm}}" state=present
+
+- name: Unblock the RabbitMQ AQMP Port
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT$"
+              line="-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  with_items:
+    - { protocol: tcp, port: 5672 }
+  notify:
+    - restart iptables

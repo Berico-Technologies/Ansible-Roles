@@ -1,0 +1,4 @@
+rabbitmq_url:       http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.1/rabbitmq-server-3.2.1-1.noarch.rpm
+rabbitmq_rpm:       rabbitmq-server-3.2.1-1.noarch.rpm
+keep_rpm_erlang:    true
+keep_rpm_rabbitmq:  true

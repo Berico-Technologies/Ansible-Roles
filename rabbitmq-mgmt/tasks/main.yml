@@ -1,0 +1,18 @@
+---
+- name: Ensure RabbitMQ is running
+  service: name=rabbitmq-server state=started
+
+- name: Enable the RabbitMQ Management Console
+  command: "rabbitmq-plugins enable {{item}}"
+  with_items: rmq_mgmt_plugins
+  notify: restart rabbitmq
+
+- name: Unblock the RabbitMQ Managment Port
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT$"
+              line="-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  with_items:
+    - { protocol: tcp, port: 15672 }
+  notify:
+    - restart iptables

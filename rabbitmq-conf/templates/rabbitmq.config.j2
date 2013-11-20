@@ -1,0 +1,25 @@
+[{rabbit, [ {tcp_listeners, [{{ rmq_port }}] }{% if rmq_use_ssl %},
+           {ssl_listeners, [{{ rmq_ssl_port }}] },
+           {ssl_options, [
+             {cacertfile, "{{ rmq_ca_cert }}" },
+             {certfile, "{{ rmq_srv_cert }}" },
+             {keyfile, "{{ rmq_srv_key }}" },
+             {verify, verify_peer},
+             {fail_if_no_peer_cert, {{ rmq_fail_if_no_peer_cert }} }]}
+{% endif %}]}{% if rmq_use_mgmt %},
+{rabbitmq_management,
+  [{listener, 
+    [{port, {{ rmq_mgmt_port }}}{% if rmq_use_mgmt_ssl %},
+     {ssl, true},
+     {ssl_opts, 
+       [{cacertfile, "{{ rmq_ca_cert }}"},
+        {certfile, "{{ rmq_mgmt_srv_cert }}"},
+        {keyfile, "{{ rmq_mgmt_srv_key }}"},
+        {verify, verify_peer},
+        {fail_if_no_peer_cert, {{ rmq_mgmt_fail_if_no_peer_cert }} }]}
+     {% endif %}
+     ]}
+ ]}{% endif %}{% if rmq_isolate_cluster_ports %},
+{kernel, [ {inet_dist_listen_min, {{ rmq_cluster_min_port}} },
+            {inet_dist_listen_max, {{ rmq_cluster_max_port}} } ]}{% endif %}
+].

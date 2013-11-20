@@ -1,0 +1,4 @@
+---
+
+- name: Generate Client Certificate
+  script: "gen_client_cert.sh {{cert_root_dir}} {{cli_country}} {{cli_state}} {{cli_city}} {{cli_organization}} {{cli_common_name}} {{cli_p12_password}}"

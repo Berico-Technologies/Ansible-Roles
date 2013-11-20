@@ -1,0 +1,1 @@
+rmq_mgmt_plugins: [ "rabbitmq_management", "rabbitmq_management_visualiser" ]
