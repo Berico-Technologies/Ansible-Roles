@@ -35,13 +35,13 @@ fi
 
 cd $rootdir
 
-if [ ! -f "${rootdir}/openssl.cnf" ];
+if [ ! -f "${rootdir}/ca/openssl.cnf" ];
 then
-    echo "openssl.cnf not present in base directory"
+    echo "openssl.cnf not present in the ca directory"
     exit 1
 fi
 
-export OPENSSL_CONF="${rootdir}/openssl.cnf"
+export OPENSSL_CONF="${rootdir}/ca/openssl.cnf"
 
 if [ ! -d ./client/ ];
 then
@@ -68,13 +68,14 @@ openssl genrsa -out $file_key $strength
 
 echo "Generating req.pem"
 
-openssl req -new -key $file_key -out $file_req -outform PEM -subj "/C=$country/ST=$state/L=$city/O=$org/CN=$cn"
+openssl req -new -key $file_key -out $file_req -outform PEM -subj /CN=client.test.openampere.com/O=client/ -nodes
+#"/C=$country/ST=$state/L=$city/O=$org/CN=$cn" -nodes
 
 cd ../ca
 
 echo "Generating cert.pem"
 
-openssl ca -in "../client/${file_req}" -out "../client/${file_cer}" -notext -batch -extensions client_ca_extensions
+openssl ca -config openssl.cnf -in "../client/${file_req}" -out "../client/${file_cer}" -notext -batch -extensions client_ca_extensions
 
 cd ../client
 

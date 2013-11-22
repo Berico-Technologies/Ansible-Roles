@@ -1,12 +1,12 @@
 ---
-- name: Add the Erlang Solutions Repository
-  copy: src=ErlangSolutions.repo dest=/etc/yum.repos.d/ErlangSolutions.repo mode=0440
+- name: Install EPEL Repository
+  yum: name=http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm state=present
 
-- name: Install Erlang Solutions RPM Key
-  rpm_key: key=http://packages.erlang-solutions.com/rpm/erlang_solutions.asc state=present
+- name: Install REMI Repository
+  yum: name=http://rpms.famillecollet.com/enterprise/remi-release-6.rpm state=present
 
 - name: Install Erlang
-  yum: name=erlang enablerepo=erlang-solutions state=latest
+  yum: name=erlang state=present
 
 - name: Install RabbitMQ RPM key
   rpm_key: key=http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
