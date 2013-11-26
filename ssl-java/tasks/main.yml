@@ -1,0 +1,7 @@
+---
+
+- name: Ensure Java JDK is available
+  yum: name="{{java_jdk_version}}" state="present"
+
+- name: Generate a Java Keystore
+  keytool: cadir="{{cert_root_dir}}" hostname="{{cli_name}}" store_password="{{cli_p12_password}}" hosts_to_trust="{{java_hosts_to_trust}}" state=present

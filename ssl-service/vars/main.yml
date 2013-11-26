@@ -1,7 +1,4 @@
 cert_root_dir:     /etc/certs
-srv_country:        US
-srv_state:          VA
-srv_city:           Reston
-srv_organization:   Example
-srv_common_name:    server.example.com
-srv_p12_password:   aaaAAA111
+srv_subj:          /DC=com/DC=example/CN=server/
+srv_p12_password:  aaaAAA111
+srv_name:          server.example.com

@@ -1,4 +1,4 @@
 ---
 
 - name: Generate Server Certificate
-  script: "gen_server_cert.sh {{cert_root_dir}} {{srv_country}} {{srv_state}} {{srv_city}} {{srv_organization}} {{srv_common_name}} {{srv_p12_password}}"
+  certificate: cadir="{{cert_root_dir}}" hostname="{{srv_name}}" subj="{{srv_subj}}" p12password="{{srv_p12_password}}"

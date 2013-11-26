@@ -1,7 +1,4 @@
-cert_root_dir:     /etc/certs
-cli_country:        US
-cli_state:          VA
-cli_city:           Reston
-cli_organization:   Example
-cli_common_name:    client.example.com
-cli_p12_password:   aaaAAA111
+cert_root_dir:    /etc/certs
+cli_subj:         /DC=com/DC=openampere/DC=test/CN=master/
+cli_name:         client.example.com
+cli_p12_password: aaaAAA111

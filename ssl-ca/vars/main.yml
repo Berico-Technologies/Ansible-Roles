@@ -1,6 +1,2 @@
-ca_country:       US
-ca_state:         VA
-ca_city:          Reston
-ca_organization:  Example
-ca_common_name:   ca.example.com
-cert_root_dir:    /etc/certs
+ca_subj:       /DC=com/DC=example/CN=CA/
+cert_root_dir: /etc/certs
