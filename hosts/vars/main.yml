@@ -1,0 +1,4 @@
+cert_root_dir:     /etc/certs
+java_jdk_version:  java-1.7.0-openjdk
+java_hosts_to_trust:
+  - server.example.com

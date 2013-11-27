@@ -1,0 +1,7 @@
+---
+- name: Registered known hosts with the /etc/hosts file.
+  lineinfile: dest=/etc/hosts
+              regexp="^{{item.ip}} {{item.fqdn}} {{item.hostname}}$"
+              line="{{item.ip}} {{item.fqdn}} {{item.hostname}}"
+              state=present
+  with_items: hosts

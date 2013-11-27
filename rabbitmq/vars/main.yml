@@ -1,4 +1,34 @@
-rabbitmq_url:       http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.1/rabbitmq-server-3.2.1-1.noarch.rpm
-rabbitmq_rpm:       rabbitmq-server-3.2.1-1.noarch.rpm
-keep_rpm_erlang:    true
-keep_rpm_rabbitmq:  true
+rabbitmq_url:                   http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.1/rabbitmq-server-3.2.1-1.noarch.rpm
+rabbitmq_rpm:                   rabbitmq-server-3.2.1-1.noarch.rpm
+keep_rpm_erlang:                true
+keep_rpm_rabbitmq:              true
+
+rmq_port:                       5672
+rmq_use_plain:                  true
+rmq_use_ssl:                    false
+rmq_ssl_port:                   5673
+rmq_ca_cert:                    /etc/certs/cacert.pem
+rmq_srv_cert:                   /etc/certs/server/rabbit.example.com.cer.pem
+rmq_srv_key:                    /etc/certs/server/rabbit.example.com.key.pem
+
+# This needs to be a String version of "true", otherwise Python will use it's literal (True)
+# which is not a valid boolean in Erlang
+rmq_fail_if_no_peer_cert:       "true"
+
+rmq_use_mgmt:                   false
+rmq_mgmt_port:                  15672
+
+rmq_use_mgmt_ssl:               false
+rmq_mgmt_srv_cert:              /etc/certs/server/rabbit.example.com.cer.pem
+rmq_mgmt_srv_key:               /etc/certs/server/rabbit.example.com.key.pem
+rmq_mgmt_plugins:               [ "rabbitmq_management", "rabbitmq_management_visualiser" ]
+
+# This needs to be a String version of "true", otherwise Python will use it's literal (True)
+# which is not a valid boolean in Erlang
+rmq_mgmt_fail_if_no_peer_cert:  "true"
+
+rmq_use_cluster:                false
+rmq_cluster_isolate_ports:      false
+rmq_cluster_min_port:           9100
+rmq_cluster_max_port:           9105
+rmq_local_erl_cookie_path:      /tmp/rmq_erlang.cookie

@@ -17,12 +17,49 @@
 - name: Install RabbitMQ RPM
   yum: name="/usr/share/{{rabbitmq_rpm}}" state=present
 
-- name: Unblock the RabbitMQ AQMP Port
+- name: Ensure RabbitMQ is running
+  service: name=rabbitmq-server state=started
+
+- name: Enable the RabbitMQ Management Console
+  command: "rabbitmq-plugins enable {{item}}"
+  with_items: rmq_mgmt_plugins
+  notify: restart rabbitmq
+
+- name: Configure RabbitMQ
+  template: src=rabbitmq.config.j2 dest=/etc/rabbitmq/rabbitmq.config owner=rabbitmq mode=0440
+  notify: restart rabbitmq
+
+- name: Unblock the non-encrypted RabbitMQ AQMP Port
   lineinfile: dest=/etc/sysconfig/iptables
-              regexp="^-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT$"
-              line="-A INPUT -p {{item.protocol}} -m {{item.protocol}} --dport {{item.port}} -j ACCEPT"
+              regexp="^-A INPUT -p tcp -m tcp --dport {{rmq_port}} -j ACCEPT$"
+              line="-A INPUT -p tcp -m tcp --dport {{rmq_port}} -j ACCEPT"
               insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
-  with_items:
-    - { protocol: tcp, port: 5672 }
-  notify:
-    - restart iptables
+  when: rmq_use_plain
+  notify: restart iptables
+
+- name: Unblock SSL port for RabbitMQ
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p tcp -m tcp --dport {{rmq_ssl_port}} -j ACCEPT$"
+              line="-A INPUT -p tcp -m tcp --dport {{rmq_ssl_port}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  when: rmq_use_ssl
+  notify: restart iptables
+
+- name: Unblock the RabbitMQ Managment Port
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p tcp -m tcp --dport {{rmq_mgmt_port}} -j ACCEPT$"
+              line="-A INPUT -p tcp -m tcp --dport {{rmq_mgmt_port}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  notify: restart iptables
+
+- name: Unblock EPMD for RabbitMQ Clustering
+  lineinfile: dest=/etc/sysconfig/iptables
+              regexp="^-A INPUT -p tcp -m tcp --dport {{rmq_cluster_min_port}}:{{rmq_cluster_max_port}} -j ACCEPT$"
+              line="-A INPUT -p tcp -m tcp --dport {{rmq_cluster_min_port}}:{{rmq_cluster_max_port}} -j ACCEPT"
+              insertafter="^:OUTPUT ACCEPT \[\d*:\d*\]$"
+  when: rmq_cluster_isolate_ports
+  notify: restart iptables
+
+- name: Fetch the RabbitMQ Erlang Cookie if we are clustering
+  fetch:  src=/var/lib/rabbitmq/.erlang.cookie dest="{{rmq_local_erl_cookie_path}}" flat=yes fail_on_missing=yes
+  when: rmq_use_cluster

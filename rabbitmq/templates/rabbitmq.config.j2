@@ -19,7 +19,7 @@
         {fail_if_no_peer_cert, {{ rmq_mgmt_fail_if_no_peer_cert }} }]}
      {% endif %}
      ]}
- ]}{% endif %}{% if rmq_isolate_cluster_ports %},
+ ]}{% endif %}{% if rmq_cluster_isolate_ports %},
 {kernel, [ {inet_dist_listen_min, {{ rmq_cluster_min_port}} },
             {inet_dist_listen_max, {{ rmq_cluster_max_port}} } ]}{% endif %}
 ].
